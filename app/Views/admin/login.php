@@ -43,6 +43,16 @@ if (file_exists($configPath)) {
 
         <p class="text-xs text-red-500 mt-2 font-medium hidden" id="errorMsg">Akses ditolak. Email tidak terdaftar sebagai Panitia.</p>
 
+        <div class="mt-6 w-full relative z-10">
+            <div class="flex items-center justify-center gap-2 mb-3">
+                <div class="h-px bg-gray-300 flex-1"></div>
+                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Akses Bilik Pemilihan</span>
+                <div class="h-px bg-gray-300 flex-1"></div>
+            </div>
+            <div id="navHub" class="grid grid-cols-3 gap-3">
+            </div>
+        </div>
+
         <div class="mt-8">
             <p class="text-xs text-gray-400">&copy; <?= date('Y') ?> PASTI Tech Studio. All rights reserved.</p>
         </div>
@@ -55,6 +65,7 @@ if (file_exists($configPath)) {
         import {
             getFirestore,
             doc,
+            onSnapshot,
             getDoc
         } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
         import {
@@ -152,6 +163,64 @@ if (file_exists($configPath)) {
                     text: 'Proses otentikasi gagal atau dibatalkan.',
                     width: '280px'
                 });
+            }
+        });
+
+        // FUNGSI RENDER PINTASAN NAVIGASI (NAVHUB)
+        const navHub = document.getElementById('navHub');
+
+        function renderNavHub(faseAktif) {
+            const phases = [{
+                    id: 1,
+                    label: 'Fase 1',
+                    name: 'DPT',
+                    icon: '📝',
+                    url: '<?= base_url('/') ?>'
+                },
+                {
+                    id: 2,
+                    label: 'Fase 2',
+                    name: 'Nominasi',
+                    icon: '💡',
+                    url: '<?= base_url('nominasi') ?>'
+                },
+                {
+                    id: 3,
+                    label: 'Fase 3',
+                    name: 'Pemilihan',
+                    icon: '🗳️',
+                    url: '<?= base_url('pemilihan') ?>'
+                }
+            ];
+
+            navHub.innerHTML = '';
+            phases.forEach(p => {
+                const isActive = p.id === faseAktif;
+                const btnClass = isActive ?
+                    "flex flex-col items-center justify-center p-2 rounded-xl border-2 border-blue-600 bg-blue-50 text-blue-700 shadow-sm transition transform hover:scale-105" :
+                    "flex flex-col items-center justify-center p-2 rounded-xl border border-gray-200 bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition transform hover:scale-105";
+
+                const badge = isActive ?
+                    `<span class="absolute -top-2 -right-2 flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-blue-600 border-2 border-white"></span></span>` :
+                    '';
+
+                navHub.innerHTML += `
+                <a href="${p.url}" class="relative ${btnClass}">
+                    ${badge}
+                    <span class="text-xl mb-1">${p.icon}</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wide">${p.label}</span>
+                    <span class="text-[9px] font-medium leading-none">${p.name}</span>
+                </a>
+            `;
+            });
+        }
+
+        // MONITOR FASE AKTIF REAL-TIME DARI FIRESTORE
+        onSnapshot(doc(db, "sistem_kontrol", "konfigurasi_app"), (docSnap) => {
+            if (docSnap.exists()) {
+                const config = docSnap.data();
+                const faseAktifGlobal = config.fase_aktif !== undefined ? config.fase_aktif : 1;
+                renderNavHub(faseAktifGlobal);
             }
         });
     </script>
