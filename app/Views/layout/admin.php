@@ -1,10 +1,33 @@
+<?php
+// BACA CACHE KONFIGURASI LOKAL (Harus di paling atas agar terbaca oleh tag Head)
+$configPath = FCPATH . 'config_app.json';
+$namaInstansi = 'VoteLock';
+$faviconUrl = base_url('assets/img/favicon.png'); // Favicon bawaan jika kosong
+
+if (file_exists($configPath)) {
+    $configApp = json_decode(file_get_contents($configPath), true);
+    if (!empty($configApp['nama_aplikasi'])) {
+        $namaInstansi = $configApp['nama_aplikasi'];
+    }
+    if (!empty($configApp['logo_url'])) {
+        $logo = $configApp['logo_url'];
+        // Cek apakah url luar (http) atau gambar lokal CI4
+        $faviconUrl = (strpos($logo, 'http') === 0) ? $logo : base_url($logo);
+    }
+}
+
+// Format Title Utama Admin
+$finalTitle = isset($title) ? $title . ' - ' . $namaInstansi : 'Dasbor Panitia - ' . $namaInstansi;
+?>
 <!DOCTYPE html>
 <html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?? 'Dasbor Panitia - VoteLock' ?></title>
+    <title><?= htmlspecialchars($finalTitle) ?></title>
+
+    <link rel="icon" type="image/png" href="<?= $faviconUrl ?>">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -51,19 +74,6 @@
         }
     </style>
 </head>
-
-<?php
-// BACA CACHE KONFIGURASI LOKAL
-$configPath = FCPATH . 'config_app.json';
-$namaInstansi = 'Sistem e-Voting Aman & Modern';
-
-if (file_exists($configPath)) {
-    $configApp = json_decode(file_get_contents($configPath), true);
-    if (!empty($configApp['nama_aplikasi'])) {
-        $namaInstansi = $configApp['nama_aplikasi'];
-    }
-}
-?>
 
 <body class="bg-gray-50 text-gray-800 flex h-screen overflow-hidden">
 
