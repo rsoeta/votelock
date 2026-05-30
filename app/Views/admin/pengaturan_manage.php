@@ -48,6 +48,12 @@
             <span class="text-[10px] text-gray-400 mt-1 block font-medium">⚠️ Gunakan tanda koma <b>( , )</b> sebagai pemisah antar nama jenjang lembaga.</span>
         </div>
 
+        <div class="mt-4">
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1.5 tracking-wide">Daftar Pilihan Masa Kerja / Pengabdian</label>
+            <textarea id="configMasaKerja" rows="3" required placeholder="Contoh: < 5 Tahun, 5 - 10 Tahun, > 10 Tahun" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 font-mono text-xs leading-relaxed shadow-sm"></textarea>
+            <span class="text-[10px] text-gray-400 mt-1 block font-medium">⚠️ Pisahkan dengan koma. Kosongkan jika tidak ingin digunakan.</span>
+        </div>
+
         <div class="pt-2 border-t border-gray-100 flex justify-end">
             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-8 rounded-xl transition duration-200 text-xs shadow-md">
                 💾 Simpan Konfigurasi Aplikasi
@@ -111,6 +117,7 @@
     const formPengaturan = document.getElementById('formPengaturan');
     const btnBackupData = document.getElementById('btnBackupData');
     const btnResetSistem = document.getElementById('btnResetSistem');
+    const configMasaKerja = document.getElementById('configMasaKerja');
 
     // Cek Keamanan Sesi
     onAuthStateChanged(auth, (user) => {
@@ -154,6 +161,10 @@
                             configDaftarLembaga.value = config.daftar_lembaga.join(',\n');
                         }
                     });
+                }
+                // Set Textarea Masa Kerja
+                if (config.daftar_masa_kerja && Array.isArray(config.daftar_masa_kerja)) {
+                    configMasaKerja.value = config.daftar_masa_kerja.join(',\n');
                 }
             }
         } catch (error) {
@@ -250,11 +261,18 @@
                         .map(str => str.trim().toUpperCase())
                         .filter(str => str !== ""); // Membuang baris kosong akibat typo koma berlebih
 
-                    // UPDATE FIRESTORE
+                    // KONVERSI TEXTAREA MASA KERJA MENJADI ARRAY KEMBALI
+                    const arrayMasaKerja = configMasaKerja.value
+                        .split(',')
+                        .map(str => str.trim()) // Tidak perlu toUpperCase
+                        .filter(str => str !== "");
+
+                    // UPDATE FIRESTORE (Kirim semua data dalam SATU KALI tembakan)
                     await updateDoc(doc(db, "sistem_kontrol", "konfigurasi_app"), {
                         nama_aplikasi: configNamaApp.value.trim(),
                         logo_url: finalLogoUrl,
-                        daftar_lembaga: arrayLembaga
+                        daftar_lembaga: arrayLembaga,
+                        daftar_masa_kerja: arrayMasaKerja
                     });
 
                     // --- TAMBAHKAN BLOK DUAL-SYNC CI4 INI ---

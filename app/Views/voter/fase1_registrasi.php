@@ -42,24 +42,52 @@
         <div class="mb-4 p-2.5 bg-green-50 text-green-800 text-xs rounded-lg text-center border border-green-200">
             Identitas perangkat tertaut:<br><strong id="displayEmail"></strong>
         </div>
-        <form id="formRegistrasi" class="space-y-4">
+        <form id="formPendataan" class="space-y-4">
             <div>
-                <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Nama Lengkap</label>
-                <input type="text" id="namaLengkap" required oninput="this.value = this.value.toUpperCase()" class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-sm font-bold uppercase shadow-sm">
+                <label for="regNamaLengkap" class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Nama Lengkap</label>
+                <input type="text" id="regNamaLengkap" required placeholder="Contoh: AHMAD ABDULLAH" oninput="this.value = this.value.toUpperCase()" class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 font-medium shadow-sm uppercase">
             </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="regTempatLahir" class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Tempat Lahir</label>
+                    <input type="text" id="regTempatLahir" required placeholder="Contoh: GARUT" oninput="this.value = this.value.toUpperCase()" class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 font-medium shadow-sm uppercase">
+                </div>
+                <div>
+                    <label for="regTanggalLahir" class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Tanggal Lahir</label>
+                    <input type="date" id="regTanggalLahir" required class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 font-medium shadow-sm">
+                </div>
+            </div>
+
             <div>
-                <label for="asalLembaga" class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Asal Lembaga</label>
+                <label for="regAlamat" class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Alamat Tinggal / Domisili</label>
+                <textarea id="regAlamat" required rows="2" placeholder="MASUKKAN ALAMAT LENGKAP SAAT INI..." oninput="this.value = this.value.toUpperCase()" class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 font-medium shadow-sm leading-relaxed uppercase"></textarea>
+            </div>
+
+            <div>
+                <label for="regWA" class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Nomor WhatsApp Aktif</label>
+                <input type="tel" id="regWA" required placeholder="Contoh: 081234567890" class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 font-medium shadow-sm">
+            </div>
+
+            <div>
+                <label for="asalLembaga" class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Asal Lembaga / Tugas Pokok</label>
                 <select id="asalLembaga" required class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm text-gray-700 font-medium shadow-sm">
                     <option value="" disabled selected>-- Pilih Jenjang / Lembaga --</option>
                 </select>
             </div>
+
             <div>
-                <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Nomor WhatsApp</label>
-                <input type="tel" id="nomorWa" placeholder="08xxxxxxxxxx" required class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-sm font-mono shadow-sm">
+                <label for="regMasaKerja" class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Lama Masa Kerja / Pengabdian</label>
+                <select id="regMasaKerja" required class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm text-gray-700 font-medium shadow-sm">
+                    <option value="" disabled selected>-- Pilih Lama Masa Kerja --</option>
+                </select>
             </div>
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 text-sm shadow-md mt-2">
-                Kirim Data Pendataan
-            </button>
+
+            <div class="pt-4">
+                <button type="submit" class="w-full flex justify-center items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition duration-200 shadow-md">
+                    📤 Kirim Data Pendataan
+                </button>
+            </div>
         </form>
     </div>
 </div>
@@ -143,6 +171,22 @@
                     option.value = lembaga;
                     option.text = lembaga;
                     asalLembagaSelect.appendChild(option);
+                });
+            }
+
+            // SETUP SELECT DROPDOWN MASA KERJA JIKA MASIH KOSONG
+            const regMasaKerjaSelect = document.getElementById('regMasaKerja');
+            if (regMasaKerjaSelect && regMasaKerjaSelect.options.length <= 1 && config.daftar_masa_kerja) {
+                let listMasaKerja = [];
+                config.daftar_masa_kerja.forEach(item => {
+                    if (item.includes(',')) listMasaKerja.push(...item.split(',').map(s => s.trim()));
+                    else listMasaKerja.push(item);
+                });
+                listMasaKerja.forEach(masa => {
+                    const option = document.createElement("option");
+                    option.value = masa;
+                    option.text = masa;
+                    regMasaKerjaSelect.appendChild(option);
                 });
             }
 
@@ -276,9 +320,34 @@
         }
     });
 
-    // ... (Fungsi formRegistrasi submit.addEventListener tetap sama) ...
-    document.getElementById('formRegistrasi').addEventListener('submit', async (e) => {
+    // PROSES SUBMIT FORMULIR REGISTRASI
+    document.getElementById('formPendataan').addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        // Tangkap seluruh data dari input form (Tambahkan pengaman toUpperCase)
+        const inputNama = document.getElementById('regNamaLengkap').value.trim().toUpperCase();
+        const inputTempatLahir = document.getElementById('regTempatLahir').value.trim().toUpperCase();
+        const inputTanggalLahir = document.getElementById('regTanggalLahir').value;
+        const inputAlamat = document.getElementById('regAlamat').value.trim().toUpperCase();
+        const inputWA = document.getElementById('regWA').value.trim();
+        const inputLembaga = document.getElementById('asalLembaga').value;
+        const inputMasaKerja = document.getElementById('regMasaKerja').value;
+
+        // Validasi Nomor WA
+        if (!/^[0-9]+$/.test(inputWA)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Format Salah',
+                text: 'Nomor WhatsApp hanya boleh berisi angka.',
+                width: '280px',
+                customClass: {
+                    popup: 'rounded-2xl'
+                }
+            });
+            return;
+        }
+
+        // Tampilkan Loading
         Swal.fire({
             title: 'Menyimpan Data...',
             width: '280px',
@@ -289,43 +358,52 @@
         });
 
         try {
+            // Susun Payload dan Simpan ke Firestore
             await setDoc(doc(db, "pemilih", userEmail), {
                 email: userEmail,
-                nama_lengkap: document.getElementById('namaLengkap').value.trim().toUpperCase(),
-                asal_lembaga: asalLembagaSelect.value,
-                nomor_whatsapp: document.getElementById('nomorWa').value.trim(),
+                nama_lengkap: inputNama,
+                tempat_lahir: inputTempatLahir,
+                tanggal_lahir: inputTanggalLahir,
+                alamat_tinggal: inputAlamat,
+                nomor_whatsapp: inputWA,
+                asal_lembaga: inputLembaga,
+                masa_kerja: inputMasaKerja,
                 status_verifikasi: 'pending',
                 fase2_sudah_memilih: false,
                 fase3_sudah_memilih: false,
                 registered_at: serverTimestamp()
             });
 
+            // Tampilkan Notifikasi Sukses
             Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil',
-                    text: 'Data Anda berhasil disimpan.',
-                    width: '280px',
-                    confirmButtonColor: '#2563eb',
-                    customClass: {
-                        popup: 'rounded-2xl'
-                    }
-                })
-                .then(() => {
-                    const nama = document.getElementById('namaLengkap').value.trim().toUpperCase();
-                    const lembaga = asalLembagaSelect.value;
-                    document.getElementById('formSection').innerHTML = `
-                <div class="text-center p-5 bg-blue-50 text-blue-900 rounded-xl border border-blue-200 shadow-sm">
-                    <h3 class="font-extrabold text-lg mb-4">BUKTI PENDATAAN</h3>
-                    <div class="bg-white p-3 rounded border border-blue-100 text-left mb-4 shadow-inner">
-                        <p class="text-xs text-gray-500 mb-1">Nama Pendaftar:</p>
-                        <p class="font-bold text-sm mb-3">${nama}</p>
-                        <p class="text-xs text-gray-500 mb-1">Asal Lembaga:</p>
-                        <p class="font-bold text-sm">${lembaga}</p>
-                    </div>
-                    <p class="text-xs text-gray-600">Silakan tangkap layar (screenshot) halaman ini sebagai bukti. Tunggu verifikasi panitia selanjutnya.</p>
-                </div>`;
-                    auth.signOut();
-                });
+                icon: 'success',
+                title: 'Berhasil',
+                text: 'Data Anda berhasil disimpan.',
+                width: '280px',
+                confirmButtonColor: '#2563eb',
+                customClass: {
+                    popup: 'rounded-2xl'
+                }
+            }).then(() => {
+                // Ubah Tampilan Menjadi Bukti Pendataan
+                document.getElementById('formSection').innerHTML = `
+                    <div class="text-center p-5 bg-blue-50 text-blue-900 rounded-xl border border-blue-200 shadow-sm animate-fade-in">
+                        <h3 class="font-extrabold text-lg mb-4">BUKTI PENDATAAN</h3>
+                        <div class="bg-white p-4 rounded-lg border border-blue-100 text-left mb-4 shadow-inner">
+                            <p class="text-[10px] text-gray-500 mb-0.5 uppercase tracking-wider font-bold">Nama Pendaftar:</p>
+                            <p class="font-bold text-sm mb-3">${inputNama}</p>
+                            
+                            <p class="text-[10px] text-gray-500 mb-0.5 uppercase tracking-wider font-bold">Asal Lembaga:</p>
+                            <p class="font-bold text-sm mb-3">${inputLembaga}</p>
+                            
+                            <p class="text-[10px] text-gray-500 mb-0.5 uppercase tracking-wider font-bold">Masa Kerja:</p>
+                            <p class="font-bold text-sm">${inputMasaKerja}</p>
+                        </div>
+                        <p class="text-xs text-gray-600 font-medium leading-relaxed">Silakan tangkap layar (screenshot) halaman ini sebagai bukti. Tunggu verifikasi panitia selanjutnya.</p>
+                    </div>`;
+
+                auth.signOut();
+            });
         } catch (error) {
             console.error(error);
             Swal.fire({

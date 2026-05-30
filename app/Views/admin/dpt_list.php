@@ -379,7 +379,7 @@
                 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
                 table { border-collapse: collapse; width: 100%; }
                 th { background-color: #1e3a8a; color: #ffffff; font-weight: bold; padding: 10px; border: 1px solid #cbd5e1; text-align: center; }
-                td { padding: 8px; border: 1px solid #cbd5e1; text-align: left; }
+                td { padding: 8px; border: 1px solid #cbd5e1; text-align: left; vertical-align: top; }
                 .text-center { text-align: center; }
             </style>
         </head>
@@ -392,8 +392,12 @@
                         <th>No</th>
                         <th>Email</th>
                         <th>Nama Lengkap</th>
+                        <th>Tempat Lahir</th>
+                        <th>Tanggal Lahir</th>
+                        <th>Alamat / Domisili</th>
                         <th>No. WhatsApp</th>
-                        <th>Lembaga</th>
+                        <th>Asal Lembaga</th>
+                        <th>Masa Kerja</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -406,7 +410,12 @@
                     <td class="text-center">${index + 1}</td>
                     <td>${p.email}</td>
                     <td style="text-transform: uppercase; font-weight: 500;">${p.nama_lengkap}</td>
-                    <td style="font-family: monospace;">'${p.nomor_whatsapp}</td> <td>${p.asal_lembaga}</td>
+                    <td style="text-transform: uppercase;">${p.tempat_lahir || '-'}</td>
+                    <td>${p.tanggal_lahir || '-'}</td>
+                    <td style="text-transform: uppercase;">${p.alamat_tinggal || '-'}</td>
+                    <td style="font-family: monospace;">'${p.nomor_whatsapp}</td> 
+                    <td>${p.asal_lembaga}</td>
+                    <td>${p.masa_kerja || '-'}</td>
                 </tr>
             `;
         });
