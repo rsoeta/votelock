@@ -1,10 +1,22 @@
+<?php
+// BACA CACHE KONFIGURASI LOKAL
+$configPath = FCPATH . 'config_app.json';
+$namaInstansi = 'Sistem e-Voting Aman & Modern';
+
+if (file_exists($configPath)) {
+    $configApp = json_decode(file_get_contents($configPath), true);
+    if (!empty($configApp['nama_aplikasi'])) {
+        $namaInstansi = $configApp['nama_aplikasi'];
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Panitia - VoteLock</title>
+    <title>Login Panitia - <?= htmlspecialchars($namaInstansi) ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -14,7 +26,7 @@
     <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border-t-4 border-blue-800 text-center">
         <div class="mb-8">
             <h1 class="text-3xl font-extrabold text-gray-900">VoteLock</h1>
-            <h6 class="text-lg font-semibold text-gray-700">Pesantren Persatuan Islam 94 Pakenjeng</h6>
+            <h6 class="text-lg font-semibold text-gray-700 leading-snug mt-1"><?= htmlspecialchars($namaInstansi) ?></h6>
             <p class="text-sm text-gray-500 mt-2">Panel Kontrol Panitia Pemilihan</p>
         </div>
 

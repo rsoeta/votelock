@@ -52,15 +52,30 @@
     </style>
 </head>
 
+<?php
+// BACA CACHE KONFIGURASI LOKAL
+$configPath = FCPATH . 'config_app.json';
+$namaInstansi = 'Sistem e-Voting Aman & Modern';
+
+if (file_exists($configPath)) {
+    $configApp = json_decode(file_get_contents($configPath), true);
+    if (!empty($configApp['nama_aplikasi'])) {
+        $namaInstansi = $configApp['nama_aplikasi'];
+    }
+}
+?>
+
 <body class="bg-gray-50 text-gray-800 flex h-screen overflow-hidden">
 
     <div id="sidebarOverlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-20 hidden transition-opacity"></div>
 
     <aside id="adminSidebar" class="fixed md:static inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out w-64 bg-blue-900 text-white flex flex-col z-30 shadow-2xl h-full">
         <div class="p-5 text-center border-b border-blue-800 flex justify-between items-center md:block">
-            <div class="md:w-full text-left md:text-center">
+            <div class="md:w-full text-left md:text-center overflow-hidden">
                 <h2 class="text-xl font-bold tracking-wider">VoteLock</h2>
-                <p class="text-[11px] text-blue-300 mt-0.5">Pesantren Persatuan Islam 94 Pakenjeng</p>
+                <p class="text-[11px] text-blue-300 mt-0.5 truncate" title="<?= htmlspecialchars($namaInstansi) ?>">
+                    <?= htmlspecialchars($namaInstansi) ?>
+                </p>
             </div>
             <button id="btnCloseMenu" class="md:hidden text-blue-200 hover:text-white">
                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
