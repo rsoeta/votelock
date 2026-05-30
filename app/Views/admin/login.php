@@ -189,7 +189,7 @@ if (file_exists($configPath)) {
                     label: 'Fase 3',
                     name: 'Pemilihan',
                     icon: '🗳️',
-                    url: '<?= base_url('pemilihan') ?>'
+                    url: '<?= base_url('vote') ?>'
                 }
             ];
 
