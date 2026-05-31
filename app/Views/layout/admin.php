@@ -25,6 +25,8 @@ $finalTitle = isset($title) ? $title . ' - ' . $namaInstansi : 'Dasbor Panitia -
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- MANTRA PENOLAK MODE GELAP -->
+    <meta name="color-scheme" content="light only">
     <title><?= htmlspecialchars($finalTitle) ?></title>
 
     <link rel="icon" type="image/png" href="<?= $faviconUrl ?>">

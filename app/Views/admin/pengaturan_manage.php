@@ -42,6 +42,11 @@
             </div>
         </div>
 
+        <div class="mt-4">
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1.5 tracking-wide">Teks Subjudul (Fase 1)</label>
+            <input type="text" id="configDeskripsiFase1" placeholder="Contoh: Fase 1: Pendataan Awal Hak Pilih" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 font-medium shadow-sm">
+        </div>
+
         <div>
             <label class="block text-xs font-bold text-gray-600 uppercase mb-1.5 tracking-wide">Daftar Pilihan Jenjang / Lembaga</label>
             <textarea id="configDaftarLembaga" rows="5" required placeholder="Contoh: RA PERSIS PAKENJENG, MI PERSIS 94 PAKENJENG, SMA PERSIS PAKENJENG" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 font-mono text-xs leading-relaxed shadow-sm"></textarea>
@@ -118,6 +123,7 @@
     const btnBackupData = document.getElementById('btnBackupData');
     const btnResetSistem = document.getElementById('btnResetSistem');
     const configMasaKerja = document.getElementById('configMasaKerja');
+    const configDeskripsiFase1 = document.getElementById('configDeskripsiFase1');
 
     // Cek Keamanan Sesi
     onAuthStateChanged(auth, (user) => {
@@ -140,6 +146,9 @@
 
                 // Set URL Logo
                 configLogoUrl.value = config.logo_url || "";
+
+                // Set Deskripsi Fase 1 (Jika Tidak Ada, Tetap Biarkan Kosong untuk Default di Frontend)
+                configDeskripsiFase1.value = config.deskripsi_fase1 || "Fase 1: Pendataan Awal Hak Pilih";
 
                 // Set Preview Gambar
                 if (config.logo_url && config.logo_url.trim() !== "") {
@@ -270,6 +279,7 @@
                     // UPDATE FIRESTORE (Kirim semua data dalam SATU KALI tembakan)
                     await updateDoc(doc(db, "sistem_kontrol", "konfigurasi_app"), {
                         nama_aplikasi: configNamaApp.value.trim(),
+                        deskripsi_fase1: configDeskripsiFase1.value.trim(),
                         logo_url: finalLogoUrl,
                         daftar_lembaga: arrayLembaga,
                         daftar_masa_kerja: arrayMasaKerja

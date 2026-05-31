@@ -2,11 +2,15 @@
 // BACA CACHE KONFIGURASI LOKAL
 $configPath = FCPATH . 'config_app.json';
 $namaInstansi = 'Sistem e-Voting Aman & Modern';
+$faviconUrl = base_url('assets/img/favicon.png'); // Favicon bawaan jika kosong
 
 if (file_exists($configPath)) {
     $configApp = json_decode(file_get_contents($configPath), true);
     if (!empty($configApp['nama_aplikasi'])) {
         $namaInstansi = $configApp['nama_aplikasi'];
+    }
+    if (!empty($configApp['favicon'])) {
+        $faviconUrl = base_url($configApp['favicon']);
     }
 }
 ?>
@@ -16,18 +20,73 @@ if (file_exists($configPath)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- MANTRA PENOLAK MODE GELAP -->
+    <meta name="color-scheme" content="light">
+    <meta name="supported-color-schemes" content="light">
     <title>Login Panitia - <?= htmlspecialchars($namaInstansi) ?></title>
+
+    <link rel="icon" type="image/png" href="<?= $faviconUrl ?>">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Ubuntu', 'sans-serif']
+                    }
+                }
+            },
+            darkMode: 'class', // MANTRA 1: Mengunci Tailwind agar hanya mau gelap kalau kita perintahkan lewat class khusus, bukan dari sistem HP
+        }
+    </script>
+
+    <style>
+        /* Ukuran dasar Mobile: Diperkecil agar Card tidak terlihat raksasa */
+        html {
+            font-size: 13px;
+        }
+
+        html,
+        body {
+            background-color: #ffffff !important;
+            color-scheme: light only;
+        }
+
+        /* Ukuran dasar Desktop/Tablet: Diperbesar ke standar baca normal */
+        @media (min-width: 768px) {
+            html {
+                font-size: 15px;
+            }
+        }
+
+        /* Penyesuaian SweetAlert2 agar presisi dengan ukuran layar */
+        .swal2-popup {
+            font-size: 0.9rem !important;
+            border-radius: 12px;
+            font-family: 'Ubuntu', sans-serif;
+        }
+
+        body {
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+    </style>
 </head>
 
-<body class="bg-gray-100 min-h-screen flex items-center justify-center font-sans p-4">
+<body class="bg-[#fefefe] text-gray-800 min-h-screen flex items-center justify-center font-sans p-4">
 
     <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border-t-4 border-blue-800 text-center">
         <div class="mb-8">
             <h1 class="text-3xl font-extrabold text-gray-900">VoteLock</h1>
             <h6 class="text-lg font-semibold text-gray-700 leading-snug mt-1"><?= htmlspecialchars($namaInstansi) ?></h6>
-            <p class="text-sm text-gray-500 mt-2">Panel Kontrol Panitia Pemilihan</p>
+            <p class="text-sm text-gray-500 mt-2">Panel Kontrol Panitia</p>
         </div>
 
         <button type="button" id="btnGoogleLoginAdmin"
@@ -43,13 +102,14 @@ if (file_exists($configPath)) {
 
         <p class="text-xs text-red-500 mt-2 font-medium hidden" id="errorMsg">Akses ditolak. Email tidak terdaftar sebagai Panitia.</p>
 
-        <div class="mt-6 w-full relative z-10">
+        <div id="navHubWrapper" class="mt-6 w-full relative z-10">
             <div class="flex items-center justify-center gap-2 mb-3">
                 <div class="h-px bg-gray-300 flex-1"></div>
-                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Akses Bilik Pemilihan</span>
+                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">FASE BERJALAN</span>
                 <div class="h-px bg-gray-300 flex-1"></div>
             </div>
-            <div id="navHub" class="grid grid-cols-3 gap-3">
+            <!-- Ubah class menjadi flex dan justify-center -->
+            <div id="navHub" class="flex justify-center gap-3">
             </div>
         </div>
 
@@ -148,7 +208,7 @@ if (file_exists($configPath)) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Akses Ditolak!',
-                        text: 'Email Anda tidak terdaftar sebagai Panitia Yayasan.',
+                        text: 'Email Anda tidak terdaftar sebagai Panitia.',
                         width: '280px',
                         confirmButtonColor: '#d33'
                     });
@@ -169,11 +229,23 @@ if (file_exists($configPath)) {
         // FUNGSI RENDER PINTASAN NAVIGASI (NAVHUB)
         const navHub = document.getElementById('navHub');
 
+        // RENDER PINTASAN NAVIGASI (HANYA TAMPIL YANG AKTIF)
         function renderNavHub(faseAktif) {
+            const navHub = document.getElementById('navHub');
+            const navHubWrapper = document.getElementById('navHubWrapper');
+
+            // Sembunyikan seluruh blok pembatas jika tidak ada fase yang aktif (Kunci Total)
+            if (faseAktif === 0) {
+                if (navHubWrapper) navHubWrapper.classList.add('hidden');
+                return;
+            } else {
+                if (navHubWrapper) navHubWrapper.classList.remove('hidden');
+            }
+
             const phases = [{
                     id: 1,
                     label: 'Fase 1',
-                    name: 'DPT',
+                    name: 'Pendataan',
                     icon: '📝',
                     url: '<?= base_url('/') ?>'
                 },
@@ -187,31 +259,27 @@ if (file_exists($configPath)) {
                 {
                     id: 3,
                     label: 'Fase 3',
-                    name: 'Pemilihan',
+                    name: 'Coblos',
                     icon: '🗳️',
-                    url: '<?= base_url('vote') ?>'
-                }
+                    url: '<?= base_url('pemilihan') ?>'
+                } // Pastikan base_url sesuai routing Anda
             ];
 
             navHub.innerHTML = '';
             phases.forEach(p => {
-                const isActive = p.id === faseAktif;
-                const btnClass = isActive ?
-                    "flex flex-col items-center justify-center p-2 rounded-xl border-2 border-blue-600 bg-blue-50 text-blue-700 shadow-sm transition transform hover:scale-105" :
-                    "flex flex-col items-center justify-center p-2 rounded-xl border border-gray-200 bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition transform hover:scale-105";
-
-                const badge = isActive ?
-                    `<span class="absolute -top-2 -right-2 flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-blue-600 border-2 border-white"></span></span>` :
-                    '';
-
-                navHub.innerHTML += `
-                <a href="${p.url}" class="relative ${btnClass}">
-                    ${badge}
-                    <span class="text-xl mb-1">${p.icon}</span>
-                    <span class="text-[10px] font-bold uppercase tracking-wide">${p.label}</span>
-                    <span class="text-[9px] font-medium leading-none">${p.name}</span>
-                </a>
-            `;
+                // HANYA RENDER (LUKIS) TOMBOL JIKA FASENYA SEDANG AKTIF
+                if (p.id === faseAktif) {
+                    navHub.innerHTML += `
+                <a href="${p.url}" class="flex flex-col items-center justify-center p-3 w-40 rounded-2xl border-2 border-blue-600 bg-blue-50 text-blue-700 shadow-md transition transform hover:scale-105 relative animate-fade-in">
+                    <span class="absolute -top-2 -right-2 flex h-4 w-4">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-4 w-4 bg-blue-600 border-2 border-white"></span>
+                    </span>
+                    <span class="text-3xl mb-1">${p.icon}</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wide text-blue-600">${p.label}</span>
+                    <span class="text-sm font-black uppercase tracking-wider">${p.name}</span>
+                </a>`;
+                }
             });
         }
 

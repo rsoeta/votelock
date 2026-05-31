@@ -65,13 +65,14 @@
     </div>
 </div>
 
-<div class="mt-6 w-full max-w-md mx-auto relative z-10 px-4 md:px-0">
+<div id="navHubWrapper" class="mt-6 w-full relative z-10">
     <div class="flex items-center justify-center gap-2 mb-3">
         <div class="h-px bg-gray-300 flex-1"></div>
-        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Akses Bilik Pemilihan</span>
+        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">FASE BERJALAN</span>
         <div class="h-px bg-gray-300 flex-1"></div>
     </div>
-    <div id="navHub" class="grid grid-cols-3 gap-3">
+    <!-- Ubah class menjadi flex dan justify-center -->
+    <div id="navHub" class="flex justify-center gap-3">
     </div>
 </div>
 <?= $this->endSection() ?>
@@ -145,48 +146,58 @@
         }
     });
 
-    // FUNGSI RENDER HUB NAVIGASI (Sama demi standarisasi sistem)
-    function renderNavHub(fase) {
+    // RENDER PINTASAN NAVIGASI (HANYA TAMPIL YANG AKTIF)
+    function renderNavHub(faseAktif) {
+        const navHub = document.getElementById('navHub');
+        const navHubWrapper = document.getElementById('navHubWrapper');
+
+        // Sembunyikan seluruh blok pembatas jika tidak ada fase yang aktif (Kunci Total)
+        if (faseAktif === 0) {
+            if (navHubWrapper) navHubWrapper.classList.add('hidden');
+            return;
+        } else {
+            if (navHubWrapper) navHubWrapper.classList.remove('hidden');
+        }
+
         const phases = [{
                 id: 1,
+                label: 'Fase 1',
                 name: 'Pendataan',
-                url: '<?= base_url('/') ?>',
-                icon: '📝'
+                icon: '📝',
+                url: '<?= base_url('/') ?>'
             },
             {
                 id: 2,
+                label: 'Fase 2',
                 name: 'Nominasi',
-                url: '<?= base_url('nominasi') ?>',
-                icon: '🗳️'
+                icon: '💡',
+                url: '<?= base_url('nominasi') ?>'
             },
             {
                 id: 3,
+                label: 'Fase 3',
                 name: 'Coblos',
-                url: '<?= base_url('vote') ?>',
-                icon: '🏆'
-            }
+                icon: '🗳️',
+                url: '<?= base_url('pemilihan') ?>'
+            } // Pastikan base_url sesuai routing Anda
         ];
 
-        let html = '';
+        navHub.innerHTML = '';
         phases.forEach(p => {
-            if (fase === p.id) {
-                html += `
-                <a href="${p.url}" class="flex flex-col items-center justify-center py-4 bg-blue-600 text-white rounded-2xl shadow-lg border-2 border-blue-400 transform transition hover:scale-105 relative overflow-hidden group">
-                    <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition duration-300"></div>
-                    <span class="text-2xl mb-1">${p.icon}</span>
-                    <span class="text-[10px] font-black uppercase tracking-wider">${p.name}</span>
-                    <span class="absolute top-2 right-2 flex h-2.5 w-2.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span></span>
-                </a>`;
-            } else {
-                html += `
-                <a href="#" onclick="event.preventDefault(); Swal.fire({icon:'warning', title:'Akses Tertutup', text:'Fase ini sedang tidak aktif.', customClass: {popup: 'rounded-2xl'}})" 
-                   class="flex flex-col items-center justify-center py-4 bg-white text-gray-400 rounded-2xl shadow-sm border border-gray-200 hover:bg-gray-50 transition cursor-not-allowed">
-                    <span class="text-2xl mb-1 opacity-50 grayscale">🔒</span>
-                    <span class="text-[10px] font-bold uppercase tracking-wider">${p.name}</span>
+            // HANYA RENDER (LUKIS) TOMBOL JIKA FASENYA SEDANG AKTIF
+            if (p.id === faseAktif) {
+                navHub.innerHTML += `
+                <a href="${p.url}" class="flex flex-col items-center justify-center p-3 w-40 rounded-2xl border-2 border-blue-600 bg-blue-50 text-blue-700 shadow-md transition transform hover:scale-105 relative animate-fade-in">
+                    <span class="absolute -top-2 -right-2 flex h-4 w-4">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-4 w-4 bg-blue-600 border-2 border-white"></span>
+                    </span>
+                    <span class="text-3xl mb-1">${p.icon}</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wide text-blue-600">${p.label}</span>
+                    <span class="text-sm font-black uppercase tracking-wider">${p.name}</span>
                 </a>`;
             }
         });
-        navHub.innerHTML = html;
     }
     // -----------------------------------------------------
 

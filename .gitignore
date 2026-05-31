@@ -124,3 +124,7 @@ _modules/*
 
 /results/
 /phpunit.xml
+
+# Abaikan folder unggahan dan file json buatan sistem
+public/uploads/*
+public/config_app.json

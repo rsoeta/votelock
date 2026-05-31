@@ -145,7 +145,7 @@
             <div class="space-y-3 mt-2 text-left" id="faseOptions">
                 <label class="flex items-center p-4 border rounded-xl cursor-pointer transition ${currentFase == 1 ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'border-gray-200 hover:bg-gray-50'}">
                     <input type="radio" name="fase_radio" value="1" class="w-5 h-5 text-blue-600 focus:ring-blue-500" ${currentFase == 1 ? 'checked' : ''}>
-                    <div class="ml-4"><span class="block font-extrabold text-gray-800">Fase 1: Pendataan DPT</span><span class="text-[10px] text-gray-500 font-semibold uppercase">Pendaftaran Hak Pilih</span></div>
+                    <div class="ml-4"><span class="block font-extrabold text-gray-800">Fase 1: Pendataan</span><span class="text-[10px] text-gray-500 font-semibold uppercase">Pendaftaran Hak Pilih</span></div>
                 </label>
                 <label class="flex items-center p-4 border rounded-xl cursor-pointer transition ${currentFase == 2 ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'border-gray-200 hover:bg-gray-50'}">
                     <input type="radio" name="fase_radio" value="2" class="w-5 h-5 text-blue-600 focus:ring-blue-500" ${currentFase == 2 ? 'checked' : ''}>
