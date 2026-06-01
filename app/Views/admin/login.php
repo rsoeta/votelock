@@ -1,7 +1,8 @@
 <?php
 // BACA CACHE KONFIGURASI LOKAL
 $configPath = FCPATH . 'config_app.json';
-$namaInstansi = 'Sistem e-Voting Aman & Modern';
+$namaInstansi = 'Sedang memuat...'; // Nama instansi default jika file konfigurasi belum ada
+$appLogoOG = base_url('assets/img/votelock-share.jpg'); // Gambar default untuk Open Graph
 $faviconUrl = base_url('assets/img/favicon.png'); // Favicon bawaan jika kosong
 
 if (file_exists($configPath)) {

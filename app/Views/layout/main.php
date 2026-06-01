@@ -3,7 +3,7 @@
 $configPath = FCPATH . 'config_app.json';
 
 // 1. Tentukan Nilai Default (Jika file konfigurasi belum ada/kosong)
-$namaInstansi = 'Sistem e-Voting Aman & Modern';
+$namaInstansi = 'Sedang memuat...';
 $appLogoOG    = base_url('assets/img/votelock-share.jpg');
 $faviconUrl   = base_url('assets/img/favicon.png');
 $deskripsiWA  = 'Sedang memuat...';
