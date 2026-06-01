@@ -1,24 +1,39 @@
 <?php
-// BACA CACHE KONFIGURASI LOKAL (Harus di paling atas agar terbaca oleh tag Head)
+// LOGIKA PHP MEMBACA CACHE KONFIGURASI UNTUK METATAGS
 $configPath = FCPATH . 'config_app.json';
-$namaInstansi = 'VoteLock';
-$faviconUrl = base_url('assets/img/favicon.png'); // Favicon bawaan jika kosong
 
+// 1. Tentukan Nilai Default (Jika file konfigurasi belum ada/kosong)
+$namaInstansi = 'Sedang memuat...';
+$appLogoOG    = base_url('assets/img/votelock-share.jpg');
+$faviconUrl   = base_url('assets/img/favicon.png');
+$deskripsiWA  = 'Sedang memuat...';
+
+// 2. Baca file konfigurasi (Hanya lakukan 1x baca agar server lebih ringan)
 if (file_exists($configPath)) {
     $configApp = json_decode(file_get_contents($configPath), true);
+
+    // Timpa nilai default jika data dari admin tersedia
     if (!empty($configApp['nama_aplikasi'])) {
         $namaInstansi = $configApp['nama_aplikasi'];
     }
+
     if (!empty($configApp['logo_url'])) {
         $logo = $configApp['logo_url'];
         // Cek apakah url luar (http) atau gambar lokal CI4
-        $faviconUrl = (strpos($logo, 'http') === 0) ? $logo : base_url($logo);
+        $appLogoOG = (strpos($logo, 'http') === 0) ? $logo : base_url($logo);
+        $faviconUrl = $appLogoOG; // Gunakan logo yayasan sebagai Favicon
+    }
+
+    // Tangkap data deskripsi WA
+    if (!empty($configApp['deskripsi_wa'])) {
+        $deskripsiWA = $configApp['deskripsi_wa'];
     }
 }
 
-// Format Title Utama Admin
-$finalTitle = isset($title) ? $title . ' - ' . $namaInstansi : 'Dasbor Panitia - ' . $namaInstansi;
+// 3. Format Title Utama
+$finalTitle = isset($title) ? 'VoteLock - ' . $title : 'VoteLock - ' . $namaInstansi;
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 
