@@ -20,6 +20,12 @@
             <input type="text" id="configNamaApp" required placeholder="Contoh: Pesantren Persatuan Islam 94 Pakenjeng" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 font-medium shadow-sm">
         </div>
 
+        <div class="mt-4">
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1.5 tracking-wide">Deskripsi WhatsApp (Link Preview)</label>
+            <textarea id="configDeskripsiWA" rows="3" placeholder="Contoh: Mari berpartisipasi! Gunakan hak suara Anda..." class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 font-medium shadow-sm"></textarea>
+            <span class="text-[10px] text-gray-400 mt-1 block font-medium">⚠️ Teks ini akan muncul sebagai deskripsi saat link aplikasi dibagikan ke WhatsApp atau media sosial.</span>
+        </div>
+
         <div>
             <label class="block text-xs font-bold text-gray-600 uppercase mb-3 tracking-wide">Logo Aplikasi</label>
 
@@ -124,6 +130,7 @@
     const btnResetSistem = document.getElementById('btnResetSistem');
     const configMasaKerja = document.getElementById('configMasaKerja');
     const configDeskripsiFase1 = document.getElementById('configDeskripsiFase1');
+    const configDeskripsiWA = document.getElementById('configDeskripsiWA');
 
     // Cek Keamanan Sesi
     onAuthStateChanged(auth, (user) => {
@@ -149,6 +156,9 @@
 
                 // Set Deskripsi Fase 1 (Jika Tidak Ada, Tetap Biarkan Kosong untuk Default di Frontend)
                 configDeskripsiFase1.value = config.deskripsi_fase1 || "Fase 1: Pendataan Awal Hak Pilih";
+
+                // Set Deskripsi WhatsApp (Jika Tidak Ada, Tetap Biarkan Kosong untuk Default di Meta Tags PHP)
+                configDeskripsiWA.value = config.deskripsi_wa || "Mari berpartisipasi! Gunakan hak suara Anda dengan aman, rahasia, dan transparan melalui bilik suara digital.";
 
                 // Set Preview Gambar
                 if (config.logo_url && config.logo_url.trim() !== "") {
@@ -280,6 +290,7 @@
                     await updateDoc(doc(db, "sistem_kontrol", "konfigurasi_app"), {
                         nama_aplikasi: configNamaApp.value.trim(),
                         deskripsi_fase1: configDeskripsiFase1.value.trim(),
+                        deskripsi_wa: configDeskripsiWA.value.trim(),
                         logo_url: finalLogoUrl,
                         daftar_lembaga: arrayLembaga,
                         daftar_masa_kerja: arrayMasaKerja
@@ -295,7 +306,8 @@
                         },
                         body: JSON.stringify({
                             nama_aplikasi: configNamaApp.value.trim(),
-                            logo_url: finalLogoUrl
+                            logo_url: finalLogoUrl,
+                            deskripsi_wa: configDeskripsiWA.value.trim()
                         })
                     });
                     // ----------------------------------------

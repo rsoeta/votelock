@@ -194,7 +194,7 @@
             // SINKRONISASI SUBJUDUL DINAMIS
             const deskripsiFase1El = document.getElementById('deskripsiFase1');
             if (deskripsiFase1El) {
-                deskripsiFase1El.innerText = config.deskripsi_fase1 || "Fase 1: Pendataan Awal Hak Pilih";
+                deskripsiFase1El.innerText = config.deskripsi_fase1 || "Fase 1: Sedang memuat...";
             }
 
             // Setup Global Fase & Gatekeeper UI
