@@ -16,7 +16,7 @@
             <img id="appLogo" src="" alt="Logo" class="h-16 mx-auto object-contain">
         </div>
         <h1 id="appTitle" class="text-xl font-bold text-gray-800 tracking-tight">Memuat Nama Sistem...</h1>
-        <p id="deskripsiFase1" class="text-xs text-blue-600 font-semibold mt-1">Fase 1: Pendataan Awal Hak Pilih</p>
+        <p id="deskripsiFase1" class="text-xs text-blue-600 font-semibold mt-1">Fase 1: Sedang memuat...</p>
     </div>
 
     <div id="loginSection" class="text-center space-y-4">
