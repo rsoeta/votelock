@@ -50,7 +50,7 @@
 
         <div class="mt-4">
             <label class="block text-xs font-bold text-gray-600 uppercase mb-1.5 tracking-wide">Teks Subjudul (Fase 1)</label>
-            <input type="text" id="configDeskripsiFase1" placeholder="Contoh: Fase 1: Pendataan Awal Hak Pilih" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 font-medium shadow-sm">
+            <input type="text" id="configDeskripsiFase1" placeholder="Contoh: Fase 1: Pendataan Awal" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 font-medium shadow-sm">
         </div>
 
         <div>
@@ -63,6 +63,33 @@
             <label class="block text-xs font-bold text-gray-600 uppercase mb-1.5 tracking-wide">Daftar Pilihan Masa Kerja / Pengabdian</label>
             <textarea id="configMasaKerja" rows="3" required placeholder="Contoh: < 5 Tahun, 5 - 10 Tahun, > 10 Tahun" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 font-mono text-xs leading-relaxed shadow-sm"></textarea>
             <span class="text-[10px] text-gray-400 mt-1 block font-medium">⚠️ Pisahkan dengan koma. Kosongkan jika tidak ingin digunakan.</span>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-gray-200">
+            <h3 class="text-sm font-black text-gray-800 uppercase tracking-widest mb-4">Ekspansi Formulir (Kolom Dinamis)</h3>
+            <p class="text-xs text-gray-500 mb-4">Isi judul kolom di bawah ini jika instansi Anda membutuhkan data tambahan (Misal: NIK, NUPTK). Kosongkan jika tidak diperlukan.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1.5">Judul Kolom Teks 1</label>
+                    <input type="text" id="configEkstraTeks1" placeholder="Contoh: NUPTK / NPK" class="w-full px-3 py-2 border rounded-lg text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1.5">Judul Kolom Teks 2</label>
+                    <input type="text" id="configEkstraTeks2" placeholder="Contoh: NIK KTP" class="w-full px-3 py-2 border rounded-lg text-sm">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1.5">Judul Kolom Pilihan</label>
+                    <input type="text" id="configEkstraDropdown" placeholder="Contoh: Status Sertifikasi" class="w-full px-3 py-2 border rounded-lg text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1.5">Opsi Pilihan (Pisahkan dgn koma)</label>
+                    <input type="text" id="configEkstraOpsi" placeholder="Contoh: Sudah Sertifikasi, Belum Sertifikasi" class="w-full px-3 py-2 border rounded-lg text-sm">
+                </div>
+            </div>
         </div>
 
         <div class="pt-2 border-t border-gray-100 flex justify-end">
@@ -131,6 +158,10 @@
     const configMasaKerja = document.getElementById('configMasaKerja');
     const configDeskripsiFase1 = document.getElementById('configDeskripsiFase1');
     const configDeskripsiWA = document.getElementById('configDeskripsiWA');
+    const configEkstraTeks1 = document.getElementById('configEkstraTeks1');
+    const configEkstraTeks2 = document.getElementById('configEkstraTeks2');
+    const configEkstraDropdown = document.getElementById('configEkstraDropdown');
+    const configEkstraOpsi = document.getElementById('configEkstraOpsi');
 
     // Cek Keamanan Sesi
     onAuthStateChanged(auth, (user) => {
@@ -155,10 +186,15 @@
                 configLogoUrl.value = config.logo_url || "";
 
                 // Set Deskripsi Fase 1 (Jika Tidak Ada, Tetap Biarkan Kosong untuk Default di Frontend)
-                configDeskripsiFase1.value = config.deskripsi_fase1 || "Fase 1: Pendataan Awal Hak Pilih";
+                configDeskripsiFase1.value = config.deskripsi_fase1 || "Fase 1: Pendataan Awal";
 
                 // Set Deskripsi WhatsApp (Jika Tidak Ada, Tetap Biarkan Kosong untuk Default di Meta Tags PHP)
-                configDeskripsiWA.value = config.deskripsi_wa || "Mari berpartisipasi! Gunakan hak suara Anda dengan aman, rahasia, dan transparan melalui bilik suara digital.";
+                configDeskripsiWA.value = config.deskripsi_wa || "Mari ikut berpartisipasi!";
+
+                configEkstraTeks1.value = config.ekstra_teks_1 || "";
+                configEkstraTeks2.value = config.ekstra_teks_2 || "";
+                configEkstraDropdown.value = config.ekstra_dropdown || "";
+                configEkstraOpsi.value = config.ekstra_opsi || "";
 
                 // Set Preview Gambar
                 if (config.logo_url && config.logo_url.trim() !== "") {
@@ -291,14 +327,17 @@
                         nama_aplikasi: configNamaApp.value.trim(),
                         deskripsi_fase1: configDeskripsiFase1.value.trim(),
                         deskripsi_wa: configDeskripsiWA.value.trim(),
+                        ekstra_teks_1: configEkstraTeks1.value.trim(),
+                        ekstra_teks_2: configEkstraTeks2.value.trim(),
+                        ekstra_dropdown: configEkstraDropdown.value.trim(),
+                        ekstra_opsi: configEkstraOpsi.value.trim(),
                         logo_url: finalLogoUrl,
                         daftar_lembaga: arrayLembaga,
                         daftar_masa_kerja: arrayMasaKerja
                     });
 
-                    // --- TAMBAHKAN BLOK DUAL-SYNC CI4 INI ---
-                    // Mengirim salinan Nama dan Logo ke server CI4 untuk dicetak di Meta Tags PHP
-                    await fetch('<?= base_url('panel/pengaturan/sync') ?>', {
+                    // Mengirim salinan ke server CI4
+                    await fetch('<?= base_url('panel/pengaturan/sync') ?>', { // (Atau sesuaikan dengan URL sync Anda)
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -307,7 +346,13 @@
                         body: JSON.stringify({
                             nama_aplikasi: configNamaApp.value.trim(),
                             logo_url: finalLogoUrl,
-                            deskripsi_wa: configDeskripsiWA.value.trim()
+                            deskripsi_wa: configDeskripsiWA.value.trim(),
+
+                            // PASTIKAN 4 BARIS INI ADA AGAR MASUK KE CONFIG_APP.JSON
+                            ekstra_teks_1: configEkstraTeks1.value.trim(),
+                            ekstra_teks_2: configEkstraTeks2.value.trim(),
+                            ekstra_dropdown: configEkstraDropdown.value.trim(),
+                            ekstra_opsi: configEkstraOpsi.value.trim()
                         })
                     });
                     // ----------------------------------------

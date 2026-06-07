@@ -1,6 +1,16 @@
 <?= $this->extend('layout/admin') ?>
 
 <?= $this->section('content') ?>
+
+<?php
+$configPath = FCPATH . 'config_app.json';
+$configApp = file_exists($configPath) ? json_decode(file_get_contents($configPath), true) : [];
+
+$judulEkstra1 = !empty($configApp['ekstra_teks_1']) ? $configApp['ekstra_teks_1'] : null;
+$judulEkstra2 = !empty($configApp['ekstra_teks_2']) ? $configApp['ekstra_teks_2'] : null;
+$judulEkstra3 = !empty($configApp['ekstra_dropdown']) ? $configApp['ekstra_dropdown'] : null;
+?>
+
 <style>
     /* CSS Khusus untuk Responsive Table (Mobile Card View) */
     @media (max-width: 768px) {
@@ -350,7 +360,7 @@
     }
 
     // FITUR EKSPOR UNTUK EXCEL REKAPITULASI DPT
-    document.getElementById('btnExportWA').addEventListener('click', () => {
+    document.getElementById('btnExportWA').addEventListener('click', async () => {
         // Ambil data yang saat ini sudah terverifikasi (verified)
         const dataTarget = semuaDataPemilih.filter(p => p.status_verifikasi === 'verified');
 
@@ -366,11 +376,37 @@
             return;
         }
 
+        // Tampilkan loading sebentar saat mengambil format kolom
+        Swal.fire({
+            title: 'Menyiapkan Format...',
+            width: '280px',
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // AMBIL JUDUL KOLOM DINAMIS LANGSUNG DARI FILE JSON SECARA REAL-TIME
+        let judul1 = "",
+            judul2 = "",
+            judul3 = "";
+        try {
+            // Tambahkan timestamp agar browser tidak membaca cache lama
+            const responConfig = await fetch('<?= base_url('config_app.json') ?>?v=' + new Date().getTime());
+            if (responConfig.ok) {
+                const configApp = await responConfig.json();
+                judul1 = configApp.ekstra_teks_1 || "";
+                judul2 = configApp.ekstra_teks_2 || "";
+                judul3 = configApp.ekstra_dropdown || "";
+            }
+        } catch (error) {
+            console.error("Gagal menarik data konfigurasi kolom", error);
+        }
+
         // Susun nama file dengan tanggal hari ini
         const tanggal = new Date().toISOString().split('T')[0];
         const filename = `Rekap_DPT_VoteLock_${tanggal}.xls`;
 
-        // Merancang struktur HTML khusus Excel agar Gridlines (Garis Kotak) otomatis aktif dan rapi
+        // Merancang struktur HTML khusus Excel 
         let excelTemplate = `
         <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
         <head>
@@ -381,6 +417,9 @@
                 th { background-color: #1e3a8a; color: #ffffff; font-weight: bold; padding: 10px; border: 1px solid #cbd5e1; text-align: center; }
                 td { padding: 8px; border: 1px solid #cbd5e1; text-align: left; vertical-align: top; }
                 .text-center { text-align: center; }
+                
+                /* MANTRA AGAR EXCEL MEMBACA ANGKA SEBAGAI TEKS MURNI */
+                .format-teks { mso-number-format:"\\@"; } 
             </style>
         </head>
         <body>
@@ -398,6 +437,9 @@
                         <th>No. WhatsApp</th>
                         <th>Asal Lembaga</th>
                         <th>Masa Kerja</th>
+                        ${judul1 ? `<th>${judul1}</th>` : ''}
+                        ${judul2 ? `<th>${judul2}</th>` : ''}
+                        ${judul3 ? `<th>${judul3}</th>` : ''}
                     </tr>
                 </thead>
                 <tbody>
@@ -413,9 +455,12 @@
                     <td style="text-transform: uppercase;">${p.tempat_lahir || '-'}</td>
                     <td>${p.tanggal_lahir || '-'}</td>
                     <td style="text-transform: uppercase;">${p.alamat_tinggal || '-'}</td>
-                    <td style="font-family: monospace;">'${p.nomor_whatsapp}</td> 
+                    <td class="format-teks">${p.nomor_whatsapp}</td> 
                     <td>${p.asal_lembaga}</td>
                     <td>${p.masa_kerja || '-'}</td>
+                    ${judul1 ? `<td class="format-teks">${p.ekstra_1 || '-'}</td>` : ''}
+                    ${judul2 ? `<td class="format-teks">${p.ekstra_2 || '-'}</td>` : ''}
+                    ${judul3 ? `<td>${p.ekstra_3 || '-'}</td>` : ''}
                 </tr>
             `;
         });
@@ -426,6 +471,9 @@
         </body>
         </html>
         `;
+
+        // Tutup loading
+        Swal.close();
 
         // Proses download Blob MS-Excel
         const blob = new Blob([excelTemplate], {
@@ -444,7 +492,7 @@
         Swal.fire({
             icon: 'success',
             title: 'Ekspor Berhasil',
-            text: 'File Excel berformat rapi siap digunakan.',
+            text: 'Data DPT beserta kolom kustom telah diunduh.',
             timer: 2000,
             showConfirmButton: false,
             customClass: {

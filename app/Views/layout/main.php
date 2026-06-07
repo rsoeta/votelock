@@ -118,7 +118,7 @@ $finalTitle = isset($title) ? 'VoteLock - ' . $title : 'VoteLock - ' . $namaInst
     </main>
 
     <footer class="text-center py-4 text-xs text-gray-500">
-        &copy; <?= date('Y') ?> VoteLock by PASTI. All rights reserved.
+        &copy; <?= date('Y') ?> VoteLock by <a href="https://studio-pasti.net" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">PASTI</a>. All rights reserved.
     </footer>
 
     <?= $this->renderSection('scripts') ?>

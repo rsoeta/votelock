@@ -83,9 +83,11 @@
                 </select>
             </div>
 
+            <div id="dynamicFieldsContainer" class="space-y-4 mt-4"></div>
+
             <div class="pt-4">
                 <button type="submit" class="w-full flex justify-center items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition duration-200 shadow-md">
-                    📤 Kirim Data Pendataan
+                    📤 Kirim Data
                 </button>
             </div>
         </form>
@@ -214,6 +216,52 @@
                 btnGoogleLogin.innerHTML = '<span class="text-lg">🔒</span> Akses Pendataan Ditutup';
                 statusAlert.className = "p-3 bg-red-50 text-red-600 text-xs font-bold rounded-lg border border-red-200";
                 statusAlert.innerHTML = "Fase 1 telah berakhir. Silakan cek status di Fase Berjalan.";
+            }
+
+            // RENDER KOLOM DINAMIS (CUSTOM FIELDS)
+            const dynamicContainer = document.getElementById('dynamicFieldsContainer');
+            if (dynamicContainer) {
+                let htmlDinamic = '';
+
+                if (config.ekstra_teks_1) {
+                    htmlDinamic += `
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">${config.ekstra_teks_1} <span class="text-red-500">*</span></label>
+                        <input type="text" id="valEkstra1" required placeholder="Masukkan ${config.ekstra_teks_1}" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    </div>`;
+                }
+
+                if (config.ekstra_teks_2) {
+                    htmlDinamic += `
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">${config.ekstra_teks_2} <span class="text-red-500">*</span></label>
+                        <input type="text" id="valEkstra2" required placeholder="Masukkan ${config.ekstra_teks_2}" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    </div>`;
+                }
+
+                // UBAHAN RADIO BUTTON UNTUK EKSTRA 3
+                if (config.ekstra_dropdown && config.ekstra_opsi) {
+                    const opsis = config.ekstra_opsi.split(',').map(o => o.trim());
+                    let radioHtml = '';
+
+                    opsis.forEach((opsi, index) => {
+                        radioHtml += `
+                        <label class="inline-flex items-center mr-5 mt-2 cursor-pointer">
+                            <input type="radio" name="valEkstra3" value="${opsi}" class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-2 focus:ring-blue-500" ${index === 0 ? 'required' : ''}>
+                            <span class="ml-2 text-sm font-medium text-gray-700">${opsi}</span>
+                        </label>`;
+                    });
+
+                    htmlDinamic += `
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">${config.ekstra_dropdown} <span class="text-red-500">*</span></label>
+                        <div class="flex flex-wrap items-center">
+                            ${radioHtml}
+                        </div>
+                    </div>`;
+                }
+
+                dynamicContainer.innerHTML = htmlDinamic;
             }
         }
     });
@@ -348,7 +396,18 @@
         const inputLembaga = document.getElementById('asalLembaga').value;
         const inputMasaKerja = document.getElementById('regMasaKerja').value;
 
-        // Validasi Nomor WA
+        // 1. TANGKAP DATA DARI KOLOM DINAMIS (Jika elemennya eksis di layar)
+        const elEkstra1 = document.getElementById('valEkstra1');
+        const elEkstra2 = document.getElementById('valEkstra2');
+
+        // Tangkap Radio Button yang sedang dipilih (Checked)
+        const elEkstra3Checked = document.querySelector('input[name="valEkstra3"]:checked');
+
+        const inputEkstra1 = elEkstra1 ? elEkstra1.value.trim().toUpperCase() : '-';
+        const inputEkstra2 = elEkstra2 ? elEkstra2.value.trim().toUpperCase() : '-';
+        const inputEkstra3 = elEkstra3Checked ? elEkstra3Checked.value.trim() : '-';
+
+        // VALIDASI WA (Bawaan)
         if (!/^[0-9]+$/.test(inputWA)) {
             Swal.fire({
                 icon: 'error',
@@ -362,7 +421,47 @@
             return;
         }
 
-        // Tampilkan Loading
+        // 🌟 VALIDASI PINTAR UNTUK KOLOM EKSTRA (BACA DOM LANGSUNG) 🌟
+        if (elEkstra1) {
+            // Ambil teks label di atas inputan dan hilangkan tanda bintang (*)
+            const title1 = elEkstra1.previousElementSibling.innerText.toUpperCase().replace(' *', '');
+            if (title1.includes('NUPTK') || title1.includes('NPK')) {
+                // Cek apakah murni angka dan jumlahnya 13 atau 16
+                if (!/^(\d{13}|\d{16})$/.test(inputEkstra1)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Format Tidak Valid',
+                        text: `${title1} harus berisi tepat 13 digit atau 16 digit angka.`,
+                        width: '280px',
+                        customClass: {
+                            popup: 'rounded-2xl'
+                        }
+                    });
+                    return;
+                }
+            }
+        }
+
+        if (elEkstra2) {
+            const title2 = elEkstra2.previousElementSibling.innerText.toUpperCase().replace(' *', '');
+            if (title2.includes('NIK')) {
+                // Cek apakah murni angka dan jumlahnya pas 16
+                if (!/^\d{16}$/.test(inputEkstra2)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Format Tidak Valid',
+                        text: `${title2} wajib berisi tepat 16 digit angka (tanpa spasi/huruf).`,
+                        width: '280px',
+                        customClass: {
+                            popup: 'rounded-2xl'
+                        }
+                    });
+                    return;
+                }
+            }
+        }
+
+        // Tampilkan Loading (Jika semua validasi lolos)
         Swal.fire({
             title: 'Menyimpan Data...',
             width: '280px',
@@ -373,7 +472,7 @@
         });
 
         try {
-            // Susun Payload dan Simpan ke Firestore
+            // 2. SUSUN PAYLOAD DAN SIMPAN KE FIRESTORE (Termasuk kolom dinamis)
             await setDoc(doc(db, "pemilih", userEmail), {
                 email: userEmail,
                 nama_lengkap: inputNama,
@@ -383,6 +482,12 @@
                 nomor_whatsapp: inputWA,
                 asal_lembaga: inputLembaga,
                 masa_kerja: inputMasaKerja,
+
+                // Kolom Dinamis Tambahan
+                ekstra_1: inputEkstra1,
+                ekstra_2: inputEkstra2,
+                ekstra_3: inputEkstra3,
+
                 status_verifikasi: 'pending',
                 fase2_sudah_memilih: false,
                 fase3_sudah_memilih: false,
@@ -400,22 +505,42 @@
                     popup: 'rounded-2xl'
                 }
             }).then(() => {
+                // JIKA MAU: Ambil label dinamis untuk tampilan Bukti Pendataan
+                let templateEkstraHTML = '';
+
+                if (elEkstra1) {
+                    const label1 = elEkstra1.previousElementSibling.innerText.toUpperCase().replace(' *', '');
+                    templateEkstraHTML += `<p class="text-[10px] text-gray-500 mb-0.5 uppercase tracking-wider font-bold">${label1}:</p><p class="font-bold text-sm mb-3">${inputEkstra1}</p>`;
+                }
+                if (elEkstra2) {
+                    const label2 = elEkstra2.previousElementSibling.innerText.toUpperCase().replace(' *', '');
+                    templateEkstraHTML += `<p class="text-[10px] text-gray-500 mb-0.5 uppercase tracking-wider font-bold">${label2}:</p><p class="font-bold text-sm mb-3">${inputEkstra2}</p>`;
+                }
+                // 🌟 PERBAIKAN UNTUK RADIO BUTTON (EKSTRA 3) 🌟
+                if (elEkstra3Checked) {
+                    // Melompat ke elemen induk pembungkusnya, lalu ambil label judul di atasnya
+                    const label3 = elEkstra3Checked.closest('.flex').previousElementSibling.innerText.toUpperCase().replace(' *', '');
+                    templateEkstraHTML += `<p class="text-[10px] text-gray-500 mb-0.5 uppercase tracking-wider font-bold">${label3}:</p><p class="font-bold text-sm mb-3">${inputEkstra3}</p>`;
+                }
+
                 // Ubah Tampilan Menjadi Bukti Pendataan
                 document.getElementById('formSection').innerHTML = `
-                    <div class="text-center p-5 bg-blue-50 text-blue-900 rounded-xl border border-blue-200 shadow-sm animate-fade-in">
-                        <h3 class="font-extrabold text-lg mb-4">BUKTI PENDATAAN</h3>
-                        <div class="bg-white p-4 rounded-lg border border-blue-100 text-left mb-4 shadow-inner">
-                            <p class="text-[10px] text-gray-500 mb-0.5 uppercase tracking-wider font-bold">Nama Pendaftar:</p>
-                            <p class="font-bold text-sm mb-3">${inputNama}</p>
-                            
-                            <p class="text-[10px] text-gray-500 mb-0.5 uppercase tracking-wider font-bold">Asal Lembaga:</p>
-                            <p class="font-bold text-sm mb-3">${inputLembaga}</p>
-                            
-                            <p class="text-[10px] text-gray-500 mb-0.5 uppercase tracking-wider font-bold">Masa Kerja:</p>
-                            <p class="font-bold text-sm">${inputMasaKerja}</p>
-                        </div>
-                        <p class="text-xs text-gray-600 font-medium leading-relaxed">Silakan tangkap layar (screenshot) halaman ini sebagai bukti. Tunggu verifikasi panitia selanjutnya.</p>
-                    </div>`;
+                <div class="text-center p-5 bg-blue-50 text-blue-900 rounded-xl border border-blue-200 shadow-sm animate-fade-in">
+                    <h3 class="font-extrabold text-lg mb-4">BUKTI PENDATAAN</h3>
+                    <div class="bg-white p-4 rounded-lg border border-blue-100 text-left mb-4 shadow-inner">
+                        <p class="text-[10px] text-gray-500 mb-0.5 uppercase tracking-wider font-bold">Nama Pendaftar:</p>
+                        <p class="font-bold text-sm mb-3">${inputNama}</p>
+                        
+                        <p class="text-[10px] text-gray-500 mb-0.5 uppercase tracking-wider font-bold">Asal Lembaga:</p>
+                        <p class="font-bold text-sm mb-3">${inputLembaga}</p>
+                        
+                        <p class="text-[10px] text-gray-500 mb-0.5 uppercase tracking-wider font-bold">Masa Kerja:</p>
+                        <p class="font-bold text-sm ${templateEkstraHTML ? 'mb-3' : ''}">${inputMasaKerja}</p>
+                        
+                        ${templateEkstraHTML}
+                    </div>
+                    <p class="text-xs text-gray-600 font-medium leading-relaxed">Silakan tangkap layar (screenshot) halaman ini sebagai bukti. Tunggu verifikasi panitia selanjutnya.</p>
+                </div>`;
 
                 auth.signOut();
             });
